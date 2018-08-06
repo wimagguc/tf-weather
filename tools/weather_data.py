@@ -17,7 +17,7 @@ Download weather data from Weather Company Data.
 """
 
 
-def download_data(latitude, longitude):
+def download_weather_data(start_date, latitude, longitude, headers):
     """
     Reads values from the endpoint and prints it to the console.
     """
@@ -25,18 +25,23 @@ def download_data(latitude, longitude):
     username = os.environ['WEATHER_USERNAME']
     password = os.environ['WEATHER_PASSWORD']
 
-    url = '{}/{}/{}/observations.json?units=m'.format(
-        base_url, str(latitude), str(longitude))
+    url = '{}/{}/{}/almanac/daily.json?units=m&start={}'.format(
+        base_url, str(latitude), str(longitude), str(start_date))
 
     r = requests.get(url, auth=(username, password))
 
     try:
         json_data = r.json()
-        json_data = json_data['observation']
-        temp_in_c = json_data['temp']
-        print('Temp in Celsius: ' + str(temp_in_c))
+        json_data = json_data['almanac_summaries'][0]
+
+        row_data = []
+        for h in headers:
+            row_data.append(json_data[h])
+
     except json.decoder.JSONDecodeError:
         print('JSON could not be decoded')
+
+    return row_data
 
 
 if __name__ == "__main__":
@@ -44,4 +49,9 @@ if __name__ == "__main__":
     latitude = 51.500673
     longitude = -0.193532
 
-    download_data(latitude, longitude)
+    headers = [
+        'station_id', 'station_name', 'almanac_dt',
+        'avg_hi', 'avg_lo']
+
+    row_data = download_weather_data(101, latitude, longitude, headers)
+    print(row_data)
