@@ -18,7 +18,8 @@ $ pip install -r requirements.txt
 
 Scripts: 
 
-To download data form Weather Company Data, use `tools/weather_data.py`. Before use, make sure to sign up for an account with them and add the username and password to the `.env` file.
+To download data form Weather Company Data, use `tools/weather_data.py > data.csv`. This will download the last year's daily minimum and maximum temperature values for a selected location and save it in `data.csv`.
+Before use, make sure to sign up for an account with them and add the username and password to the `.env` file.
 
 ## License
 

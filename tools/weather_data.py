@@ -1,6 +1,10 @@
+from dateutil import rrule
+from datetime import datetime
 import json
 import requests
 import os
+import numpy
+import sys
 
 """
 Download weather data from Weather Company Data.
@@ -45,7 +49,7 @@ def download_weather_data(start_date, latitude, longitude, headers):
 
 
 if __name__ == "__main__":
-    # Times Square
+    # London
     latitude = 51.500673
     longitude = -0.193532
 
@@ -53,5 +57,19 @@ if __name__ == "__main__":
         'station_id', 'station_name', 'almanac_dt',
         'avg_hi', 'avg_lo']
 
-    row_data = download_weather_data(101, latitude, longitude, headers)
-    print(row_data)
+    all_data = []
+    all_data.append(headers)
+
+    days_in_a_year = rrule.rrule(
+        rrule.DAILY,
+        dtstart=datetime.strptime('20000101', '%Y%m%d'),
+        until=datetime.strptime('20000131', '%Y%m%d'))
+
+    for dt in days_in_a_year:
+        i = int(dt.strftime('%m%d'))
+        row_data = download_weather_data(i, latitude, longitude, headers)
+        all_data.append(row_data)
+
+    all_data = numpy.asarray(all_data, dtype=object)
+    numpy.savetxt(sys.stdout, all_data, delimiter=',', fmt='%s')
+
